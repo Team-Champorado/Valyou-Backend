@@ -1,0 +1,9 @@
+node_modules
+dist
+uploads/*
+!uploads/.gitkeep
+.git
+.env
+*.log
+.nyc_output
+coverage

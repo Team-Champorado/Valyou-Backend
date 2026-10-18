@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  password       String
+  firstName      String
+  middleName     String?
+  lastName       String
+  phoneNumber    String?
+  profilePicture String?
+  listings       Listing[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Listing {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  title       String
+  description String?
+  address     String
+  latitude    Float
+  longitude   Float
+  price             Float
+  lotSize           Float
+  yearBuilt         Int
+  propertyType      String
+  parkingSpaces     Int
+  titleType         String
+  isRenovated       Boolean
+  renovationDetails String?
+  valuationStatus   String      @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  images            Image[]
+  valuations        Valuation[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  type      String   // 'normal' or 'panorama'
+  createdAt DateTime @default(now())
+}
+
+model Valuation {
+  id             String   @id @default(uuid())
+  listingId      String
+  listing        Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  estimatedValue     Float
+  finalValuation     Float
+  riskLevel          String // LOW, MEDIUM, HIGH
+  riskScore          Float
+  riskDetails        Json
+  accessibilityScore Float
+  nearbyHotspots     Json
+  locationPremium    Float
+  aiAnalysis         String? // JSON string or text summary from stub
+  structuralInsights Json?   // List of structural findings
+  valuationBreakdown Json?   // Breakdown of calculations
+  createdAt          DateTime @default(now())
+}
